@@ -36,10 +36,10 @@ resource "google_compute_instance" "instance-1" {
   }
 
   scheduling {
-    automatic_restart   = false
-    on_host_maintenance = "TERMINATE"
-    preemptible         = true
-    provisioning_model  = "SPOT"
+    automatic_restart           = false
+    on_host_maintenance         = "TERMINATE"
+    preemptible                 = true
+    provisioning_model          = "SPOT"
     instance_termination_action = "STOP"
   }
 
@@ -50,4 +50,8 @@ resource "google_compute_instance" "instance-1" {
   }
 
   zone = "europe-west1-b"
+
+  metadata = {
+    startup-script = "apt update && apt install -yq nginx"
+  }
 }
