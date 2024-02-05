@@ -3,7 +3,7 @@ data "google_compute_image" "my_image" {
   project = "debian-cloud"
 }
 
-resource "google_compute_instance" "instance-1" {
+resource "google_compute_instance" "blog" {
   boot_disk {
     auto_delete = true
     device_name = "instance-1"
