@@ -1,4 +1,4 @@
-#variable "instance_type" {
-#  description = "Type of EC2 instance to provision"
-#  default     = "t3.nano"
-#}
+variable "machine_type" {
+ description = "Type of machine to provision"
+ default     = "f1-micro"
+}

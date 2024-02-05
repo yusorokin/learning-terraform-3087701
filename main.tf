@@ -21,7 +21,7 @@ resource "google_compute_instance" "instance-1" {
   deletion_protection = false
   enable_display      = false
 
-  machine_type = "f1-micro"
+  machine_type = var.machine_type
 
   name = "instance-1"
 
