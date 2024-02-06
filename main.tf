@@ -3,7 +3,15 @@ data "google_compute_image" "my_image" {
   project = "debian-cloud"
 }
 
+data "google_compute_network" "default" {
+  name = "default"
+}
+
 resource "google_compute_instance" "blog" {
+  name         = "instance-1"
+  machine_type = var.machine_type
+  zone         = "europe-west1-b"
+
   boot_disk {
     auto_delete = true
     device_name = "instance-1"
@@ -17,22 +25,8 @@ resource "google_compute_instance" "blog" {
     mode = "READ_WRITE"
   }
 
-  can_ip_forward      = false
-  deletion_protection = false
-  enable_display      = false
-
-  machine_type = var.machine_type
-
-  name = "instance-1"
-
   network_interface {
-    access_config {
-      network_tier = "PREMIUM"
-    }
-
-    queue_count = 0
-    stack_type  = "IPV4_ONLY"
-    subnetwork  = "projects/dynamic-density-246618/regions/europe-west1/subnetworks/default"
+    network = data.google_compute_network.default.id
   }
 
   scheduling {
@@ -43,15 +37,36 @@ resource "google_compute_instance" "blog" {
     instance_termination_action = "STOP"
   }
 
-  shielded_instance_config {
-    enable_integrity_monitoring = true
-    enable_secure_boot          = false
-    enable_vtpm                 = true
-  }
-
-  zone = "europe-west1-b"
-
   metadata = {
     startup-script = "apt update && apt install -yq nginx"
   }
+}
+
+resource "google_compute_firewall" "rules_ingress" {
+  name        = "blog"
+  description = "Allow http and https in."
+
+  network   = data.google_compute_network.default.id
+  direction = "INGRESS"
+
+  allow {
+    protocol = "tcp"
+    ports    = [80, 443]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+}
+
+resource "google_compute_firewall" "rules_egress" {
+  name        = "blog"
+  description = " Allow everything out."
+
+  network   = data.google_compute_network.default.id
+  direction = "EGRESS"
+
+  allow {
+    protocol = "all"
+  }
+
+  destination_ranges = ["0.0.0.0/0"]
 }
