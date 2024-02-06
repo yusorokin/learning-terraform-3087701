@@ -43,7 +43,7 @@ resource "google_compute_instance" "blog" {
 }
 
 resource "google_compute_firewall" "rules_ingress" {
-  name        = "blog"
+  name        = "allow_http_ingress"
   description = "Allow http and https in."
 
   network   = data.google_compute_network.default.id
@@ -58,7 +58,7 @@ resource "google_compute_firewall" "rules_ingress" {
 }
 
 resource "google_compute_firewall" "rules_egress" {
-  name        = "blog"
+  name        = "allow_all_egress"
   description = " Allow everything out."
 
   network   = data.google_compute_network.default.id
