@@ -27,7 +27,9 @@ resource "google_compute_instance" "blog" {
 
   network_interface {
     network = data.google_compute_network.default.id
+    access_config {}
   }
+
 
   scheduling {
     automatic_restart           = false
