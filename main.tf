@@ -1,8 +1,3 @@
-data "google_compute_image" "my_image" {
-  family  = "debian-11"
-  project = "debian-cloud"
-}
-
 module "blog_vpc" {
   source  = "terraform-google-modules/network/google"
   version = "~> 9.0"
@@ -74,17 +69,13 @@ module "vm_instance_template" {
 
   machine_type = var.machine_type
 
-  metadata = {
-    startup-script = "apt update && apt install -yq nginx"
-  }
-
   tags = ["allow-lb-service"]
 
   network    = module.blog_vpc.network_id
   subnetwork = module.blog_vpc.subnets_ids[0]
   # access_config = [{}]
 
-  source_image = data.google_compute_image.my_image.self_link
+  source_image = "nginx"
   disk_size_gb = 10
   disk_type    = "pd-balanced"
   auto_delete  = true
