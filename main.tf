@@ -27,15 +27,26 @@ module "blog_vpc" {
       next_hop_internet = "true"
     },
   ]
-  ingress_rules = [{
-    name          = "allow-http-ingress"
-    description   = "Allow http and https in."
-    source_ranges = ["0.0.0.0/0"]
-    allow = [{
-      protocol = "tcp"
-      ports    = [80, 443]
-    }]
-  }]
+  ingress_rules = [
+    {
+      name          = "allow-http-ingress"
+      description   = "Allow http and https in."
+      source_ranges = ["0.0.0.0/0"]
+      allow = [{
+        protocol = "tcp"
+        ports    = [80, 443]
+      }]
+    },
+    {
+      name          = "allow-ssh-ingress"
+      description   = "Allow http and https in."
+      source_ranges = ["0.0.0.0/0"]
+      allow = [{
+        protocol = "tcp"
+        ports    = [22]
+      }]
+    },
+  ]
 
   egress_rules = [{
     name               = "allow-all-egress"
@@ -89,7 +100,7 @@ module "managed_instance_group" {
   version = "10.1.1"
 
   project_id = var.project_id
-  region  = var.region
+  region     = var.region
 
   min_replicas = 1
   max_replicas = 2
