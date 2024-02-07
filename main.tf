@@ -32,7 +32,7 @@ module "blog_vpc" {
       destination_range      = "10.50.10.0/24"
       tags                   = "app-proxy"
       next_hop_instance      = "app-proxy-instance"
-      next_hop_instance_zone = var.region
+      next_hop_instance_zone = "europe-west1-b"
     },
   ]
   ingress_rules = [{
