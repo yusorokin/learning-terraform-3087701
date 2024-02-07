@@ -1,3 +1,8 @@
+data "google_compute_image" "nginx_image" {
+  name = "nginx"
+  project = var.project_id
+}
+
 module "blog_vpc" {
   source  = "terraform-google-modules/network/google"
   version = "~> 9.0"
@@ -75,7 +80,7 @@ module "vm_instance_template" {
   subnetwork = module.blog_vpc.subnets_ids[0]
   # access_config = [{}]
 
-  source_image = "global/images/nginx"
+  source_image = data.google_compute_image.nginx_image.self_link
   disk_size_gb = 10
   disk_type    = "pd-balanced"
   auto_delete  = true
