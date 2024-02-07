@@ -7,6 +7,6 @@ terraform {
 }
 
 provider "google" {
-  project = "dynamic-density-246618"
-  region  = "europe-west1"
+  project = var.project_id
+  region  = var.region
 }
