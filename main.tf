@@ -75,7 +75,7 @@ module "vm_instance_template" {
   subnetwork = module.blog_vpc.subnets_ids[0]
   # access_config = [{}]
 
-  source_image = "nginx"
+  source_image = "projects/${var.project_id}/global/machineImages/nginx"
   disk_size_gb = 10
   disk_type    = "pd-balanced"
   auto_delete  = true
