@@ -44,31 +44,30 @@ resource "google_compute_instance" "blog" {
   }
 }
 
-resource "google_compute_firewall" "rules_ingress" {
-  name        = "allow-http-ingress"
-  description = "Allow http and https in."
 
-  network   = data.google_compute_network.default.id
-  direction = "INGRESS"
+module "network_firewall-rules" {
+  source  = "terraform-google-modules/network/google//modules/firewall-rules"
+  version = "9.0.0"
 
-  allow {
-    protocol = "tcp"
-    ports    = [80, 443]
-  }
+  project_id = "dynamic-density-246618"
+  network_name = data.google_compute_network.default.name
 
-  source_ranges = ["0.0.0.0/0"]
-}
+  ingress_rules = [{
+    name          = "allow-http-ingress"
+    description   = "Allow http and https in."
+    source_ranges = ["0.0.0.0/0"]
+    allow = [{
+      protocol = "tcp"
+      ports    = [80, 443]
+    }]
+  }]
 
-resource "google_compute_firewall" "rules_egress" {
-  name        = "allow-all-egress"
-  description = " Allow everything out."
-
-  network   = data.google_compute_network.default.id
-  direction = "EGRESS"
-
-  allow {
-    protocol = "all"
-  }
-
-  destination_ranges = ["0.0.0.0/0"]
+  egress_rules = [{
+    name               = "allow-all-egress"
+    description        = "Allow everything out."
+    destination_ranges = ["0.0.0.0/0"]
+    allow = [{
+      protocol = "all"
+    }]
+  }]
 }
