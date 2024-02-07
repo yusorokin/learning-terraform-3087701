@@ -47,40 +47,59 @@ module "blog_vpc" {
   }]
 }
 
-resource "google_compute_instance" "blog" {
-  name                      = "instance-1"
-  machine_type              = var.machine_type
-  zone                      = "europe-west1-b"
-  allow_stopping_for_update = true
+module "load_balancer" {
+  source       = "GoogleCloudPlatform/lb/google"
+  version      = "~> 2.0.0"
+  region       = var.region
+  name         = "blog-load-balancer"
+  service_port = 80
+  target_tags  = ["allow-lb-service"]
+  network      = module.blog_vpc.network_id
+}
 
-  boot_disk {
-    auto_delete = true
-    device_name = "instance-1"
+module "vm_instance_template" {
+  source  = "terraform-google-modules/vm/google//modules/instance_template"
+  version = "10.1.1"
 
-    initialize_params {
-      image = data.google_compute_image.my_image.self_link
-      size  = 10
-      type  = "pd-balanced"
-    }
-
-    mode = "READ_WRITE"
-  }
-
-  network_interface {
-    network    = module.blog_vpc.network_id
-    subnetwork = module.blog_vpc.subnets_ids[0]
-    access_config {}
-  }
-
-  scheduling {
-    automatic_restart           = false
-    on_host_maintenance         = "TERMINATE"
-    preemptible                 = true
-    provisioning_model          = "SPOT"
-    instance_termination_action = "STOP"
-  }
+  machine_type = var.machine_type
 
   metadata = {
     startup-script = "apt update && apt install -yq nginx"
   }
+
+  tags = ["allow-lb-service"]
+
+  network    = module.blog_vpc.network_id
+  subnetwork = module.blog_vpc.subnets_ids[0]
+  # access_config = [{}]
+
+  source_image = data.google_compute_image.my_image.self_link
+  disk_size_gb = 10
+  disk_type    = "pd-balanced"
+  auto_delete  = true
+
+  service_account = {
+    email  = "terraform@dynamic-density-246618.iam.gserviceaccount.com"
+    scopes = ["cloud-platform"]
+  }
+}
+
+module "managed_instance_group" {
+  source  = "terraform-google-modules/vm/google//modules/mig"
+  version = "10.1.1"
+
+  project_id = var.project_id
+  region  = var.region
+
+  min_replicas = 1
+  max_replicas = 2
+  hostname     = "blog-mig"
+
+  instance_template = module.vm_instance_template.self_link
+  target_pools      = [module.load_balancer.target_pool]
+
+  named_ports = [{
+    name = "http"
+    port = 80
+  }]
 }

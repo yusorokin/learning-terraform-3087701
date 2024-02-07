@@ -8,6 +8,11 @@ variable "region" {
   default     = "europe-west1"
 }
 
+variable "zone" {
+  description = "Zone"
+  default     = "europe-west1-b"
+}
+
 variable "machine_type" {
   description = "Type of machine to provision"
   default     = "f1-micro"
