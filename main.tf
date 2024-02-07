@@ -48,9 +48,10 @@ module "blog_vpc" {
 }
 
 resource "google_compute_instance" "blog" {
-  name         = "instance-1"
-  machine_type = var.machine_type
-  zone         = "europe-west1-b"
+  name                      = "instance-1"
+  machine_type              = var.machine_type
+  zone                      = "europe-west1-b"
+  allow_stopping_for_update = true
 
   boot_disk {
     auto_delete = true
@@ -70,7 +71,6 @@ resource "google_compute_instance" "blog" {
     subnetwork = module.blog_vpc.subnets_ids[0]
     access_config {}
   }
-
 
   scheduling {
     automatic_restart           = false
