@@ -1,5 +1,5 @@
 data "google_compute_image" "nginx_image" {
-  name = "nginx"
+  name    = var.instance_template.image_name
   project = var.project_id
 }
 
@@ -8,12 +8,12 @@ module "blog_vpc" {
   version = "~> 9.0"
 
   project_id   = var.project_id
-  network_name = "dev"
+  network_name = "${var.environment.name}-vpc"
 
   subnets = [
     {
-      subnet_name   = "subnet-01"
-      subnet_ip     = "10.10.10.0/24"
+      subnet_name   = "${var.environment.name}-subnet-01"
+      subnet_ip     = "${var.environment.network_prefix}.10.0/24"
       subnet_region = var.region
     },
   ]
@@ -62,9 +62,9 @@ module "load_balancer" {
   source       = "GoogleCloudPlatform/lb/google"
   version      = "~> 2.0.0"
   region       = var.region
-  name         = "blog-load-balancer"
+  name         = "${var.environment.name}-blog"
   service_port = 80
-  target_tags  = ["allow-lb-service"]
+  target_tags  = ["${var.environment.name}-lb"]
   network      = module.blog_vpc.network_id
 }
 
@@ -72,17 +72,16 @@ module "vm_instance_template" {
   source  = "terraform-google-modules/vm/google//modules/instance_template"
   version = "10.1.1"
 
-  machine_type = var.machine_type
+  machine_type = var.instance_template.machine_type
 
-  tags = ["allow-lb-service"]
+  tags = ["${var.environment.name}-lb"]
 
   network    = module.blog_vpc.network_id
   subnetwork = module.blog_vpc.subnets_ids[0]
-  # access_config = [{}]
 
   source_image = data.google_compute_image.nginx_image.self_link
-  disk_size_gb = 10
-  disk_type    = "pd-balanced"
+  disk_size_gb = var.instance_template.disk_size_gb
+  disk_type    = var.instance_template.disk_type
   auto_delete  = true
 
   service_account = {
@@ -100,7 +99,7 @@ module "managed_instance_group" {
 
   min_replicas = 1
   max_replicas = 2
-  hostname     = "blog-mig"
+  hostname     = "${var.environment.name}-blog"
 
   instance_template = module.vm_instance_template.self_link
   target_pools      = [module.load_balancer.target_pool]
