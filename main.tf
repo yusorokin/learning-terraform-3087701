@@ -97,8 +97,8 @@ module "managed_instance_group" {
   project_id = var.project_id
   region     = var.region
 
-  min_replicas = 1
-  max_replicas = 2
+  min_replicas = var.mig_min_replicas
+  max_replicas = var.mig_max_replicas
   hostname     = "${var.environment.name}-blog"
 
   instance_template = module.vm_instance_template.self_link
