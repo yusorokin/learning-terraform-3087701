@@ -44,11 +44,11 @@ variable "environment" {
 variable "mig_min_replicas" {
   description = "MIG minimal replica count"
   type        = number
-  default     = 1
+  default     = 2
 }
 
 variable "mig_max_replicas" {
   description = "MIG minimal replica count"
   type        = number
-  default     = 1
+  default     = 2
 }
