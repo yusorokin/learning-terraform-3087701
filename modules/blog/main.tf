@@ -20,7 +20,7 @@ module "blog_vpc" {
 
   routes = [
     {
-      name              = "egress-internet"
+      name              = "${var.environment.name}-egress-internet"
       description       = "route through IGW to access internet"
       destination_range = "0.0.0.0/0"
       tags              = "egress-inet"
@@ -29,7 +29,7 @@ module "blog_vpc" {
   ]
   ingress_rules = [
     {
-      name          = "allow-http-ingress"
+      name          = "${var.environment.name}-allow-http-ingress"
       description   = "Allow http and https in."
       source_ranges = ["0.0.0.0/0"]
       allow = [{
@@ -38,7 +38,7 @@ module "blog_vpc" {
       }]
     },
     {
-      name          = "allow-ssh-ingress"
+      name          = "${var.environment.name}-allow-ssh-ingress"
       description   = "Allow http and https in."
       source_ranges = ["0.0.0.0/0"]
       allow = [{
@@ -49,7 +49,7 @@ module "blog_vpc" {
   ]
 
   egress_rules = [{
-    name               = "allow-all-egress"
+    name               = "${var.environment.name}-allow-all-egress"
     description        = "Allow everything out."
     destination_ranges = ["0.0.0.0/0"]
     allow = [{
